@@ -1,0 +1,283 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>  // Biblioteca para funções matemáticas, como pow(), utilizada no cálculo de juros compostos
+
+// Prototipação de funções
+void exibir_menu_cliente();    // Função para exibir o menu de opções do cliente
+void exibir_menu_funcionario();  // Função para exibir o menu de opções do funcionário
+void autenticar_usuario();  // Função de autenticação no sistema
+void registrar_novo_cliente();  // Função para registrar um novo cliente no sistema
+void gerar_relatorio_transacional();  // Função para gerar relatório de transações comerciais realizadas
+void realizar_transacao_compra();  // Função que simula a aquisição de um veículo
+void registrar_transacao(char veiculo_escolhido[], float valor_total_pago, char modalidade_pagamento[], float valor_pago_entrada, int numero_mensalidades);  // Função para registrar uma transação no arquivo
+
+int main() {
+    autenticar_usuario();  // Inicia a autenticação do usuário
+    return 0;
+}
+
+// Função que exibe o menu de opções do cliente
+void exibir_menu_cliente() {
+    int escolha_opcao_cliente = 0;  // Variável para armazenar a opção selecionada pelo cliente
+
+    while (1) {  // Loop contínuo até que o cliente opte por sair
+        printf("\n------ MENU DO CLIENTE ------\n");
+        printf("1. Realizar aquisição de veículo\n");  // Opção de compra de veículo
+        printf("2. Encerrar sessão\n");  // Opção de sair do menu
+        printf("Selecione a opção desejada: ");
+        scanf("%d", &escolha_opcao_cliente);  // Coleta a escolha do cliente
+
+        if (escolha_opcao_cliente == 1) {
+            realizar_transacao_compra();  // Encaminha para o processo de compra de veículo
+        } else if (escolha_opcao_cliente == 2) {
+            printf("Encerrando sessão...\n");  // Mensagem de término de sessão
+            break;
+        } else {
+            printf("Opção inválida. Por favor, tente novamente.\n");  // Notificação de escolha inválida
+        }
+    }
+}
+
+// Função que exibe o menu de opções do funcionário
+void exibir_menu_funcionario() {
+    int escolha_opcao_funcionario = 0;  // Variável para armazenar a opção selecionada pelo funcionário
+
+    while (1) {  // Loop contínuo até que o funcionário opte por sair
+        printf("\n------ MENU DO FUNCIONÁRIO ------\n");
+        printf("1. Registrar novo cliente\n");  // Opção de cadastro de novo cliente
+        printf("2. Emitir relatório de transações\n");  // Opção de emissão de relatório de vendas
+        printf("3. Executar transação de venda\n");  // Opção para realizar venda
+        printf("4. Encerrar sessão\n");  // Opção de sair do menu
+        printf("Selecione a opção desejada: ");
+        scanf("%d", &escolha_opcao_funcionario);  // Coleta a escolha do funcionário
+
+        if (escolha_opcao_funcionario == 1) {
+            registrar_novo_cliente();  // Redireciona para o cadastro de cliente
+        } else if (escolha_opcao_funcionario == 2) {
+            gerar_relatorio_transacional();  // Emite o relatório de transações comerciais
+        } else if (escolha_opcao_funcionario == 3) {
+            realizar_transacao_compra();  // Realiza a venda de um veículo
+        } else if (escolha_opcao_funcionario == 4) {
+            printf("Encerrando sessão...\n");  // Notifica o término da sessão
+            break;
+        } else {
+            printf("Opção inválida. Por favor, tente novamente.\n");  // Mensagem de erro para opção inválida
+        }
+    }
+}
+
+// Função de autenticação de usuário no sistema
+void autenticar_usuario() {
+    // Arrays de strings contendo credenciais de usuários e senhas
+    char credenciais_usuario[2][20] = {"colaborador", "cliente"};
+    char credenciais_senha[2][20] = {"1234", "5678"};
+    char usuario_informado[20], senha_informada[20];
+
+    while (1) {  // Loop até a autenticação bem-sucedida
+        printf("\n------ SISTEMA DE AUTENTICAÇÃO ------\n");
+        printf("Digite seu identificador de usuário: ");  // Requisita o identificador de usuário
+        scanf("%s", usuario_informado);
+        printf("Digite sua chave de acesso: ");  // Requisita a chave de acesso (senha)
+        scanf("%s", senha_informada);
+
+        // Verifica se as credenciais correspondem a um funcionário
+        if (strcmp(usuario_informado, credenciais_usuario[0]) == 0 && strcmp(senha_informada, credenciais_senha[0]) == 0) {
+            printf("Autenticação bem-sucedida. Acesso concedido ao funcionário: %s.\n", usuario_informado);
+            exibir_menu_funcionario();  // Redireciona para o menu do funcionário
+            break;
+
+        // Verifica se as credenciais correspondem a um cliente
+        } else if (strcmp(usuario_informado, credenciais_usuario[1]) == 0 && strcmp(senha_informada, credenciais_senha[1]) == 0) {
+            printf("Autenticação bem-sucedida. Acesso concedido ao cliente: %s.\n", usuario_informado);
+            exibir_menu_cliente();  // Redireciona para o menu do cliente
+            break;
+
+        } else {
+            printf("Credenciais inválidas. Por favor, tente novamente.\n");  // Notificação de erro de autenticação
+        }
+    }
+}
+
+// Função para registrar um novo cliente no sistema
+void registrar_novo_cliente() {
+    char identificador_cliente[50], contato_telefone_cliente[20];  // Variáveis para armazenar os dados do cliente
+
+    printf("Insira o nome completo do cliente: ");
+    scanf("%s", identificador_cliente);  // Coleta o nome do cliente
+    printf("Insira o telefone para contato: ");
+    scanf("%s", contato_telefone_cliente);  // Coleta o telefone do cliente
+
+    // Abre o arquivo "clientes.txt" em modo de adição ("a")
+    FILE *arquivo_cliente = fopen("clientes.txt", "a");
+    if (arquivo_cliente == NULL) {  // Verifica se o arquivo foi aberto corretamente
+        printf("Erro crítico ao abrir o arquivo de registros.\n");
+        return;
+    }
+
+    // Escreve as informações do cliente no arquivo
+    fprintf(arquivo_cliente, "Nome: %s, Telefone: %s\n", identificador_cliente, contato_telefone_cliente);
+    fclose(arquivo_cliente);  // Fecha o arquivo
+
+    printf("Novo cliente registrado com sucesso!\n");
+}
+
+// Função para emitir o relatório de transações realizadas
+void gerar_relatorio_transacional() {
+    // Abre o arquivo "venda.txt" em modo de leitura
+    FILE *arquivo_transacoes = fopen("venda.txt", "r");
+    if (arquivo_transacoes == NULL) {  // Verifica a existência do arquivo
+        printf("Nenhuma transação registrada até o presente momento.\n");
+        return;
+    }
+
+    char caractere;
+    printf("\n------ RELATÓRIO DE TRANSAÇÕES COMERCIAIS ------\n");
+    // Lê e exibe o conteúdo do arquivo caractere por caractere
+    while ((caractere = fgetc(arquivo_transacoes)) != EOF) {
+        putchar(caractere);  // Exibe o caractere lido
+    }
+    fclose(arquivo_transacoes);  // Fecha o arquivo
+}
+
+// Função que simula a transação de compra de um veículo
+void realizar_transacao_compra() {
+    char *catalogo_veiculos[3] = {"Honda Civic", "BMW Série 3", "Volkswagen Virtus"};  // Lista de veículos disponíveis
+    float precos_veiculos[3] = {100000.0, 300000.0, 150000.0};  // Preços dos veículos
+    int escolha_veiculo;  // Armazena a escolha do veículo
+
+    printf("\n------ CATÁLOGO DE VEÍCULOS DISPONÍVEIS ------\n");
+    for (int i = 0; i < 3; i++) {
+        printf("%d. %s - R$%.2f\n", i + 1, catalogo_veiculos[i], precos_veiculos[i]);  // Exibe o catálogo de veículos
+    }
+
+    printf("Selecione o veículo desejado através do número correspondente: ");
+    scanf("%d", &escolha_veiculo);  // Coleta a escolha do cliente
+
+    // Verifica se a escolha é válida
+    if (escolha_veiculo < 1 || escolha_veiculo > 3) {
+        printf("Escolha inválida. Tente novamente.\n");
+        return;
+    }
+
+    // Seleciona o veículo e o preço baseado na escolha
+    char *veiculo_selecionado = catalogo_veiculos[escolha_veiculo - 1];
+    float valor_veiculo_selecionado = precos_veiculos[escolha_veiculo - 1];
+
+    float valor_entrada = 0.0, valor_total_pago = 0.0;
+    int opcao_pagamento, quantidade_mensalidades = 0;
+    char modalidade_pagamento[30];
+
+    printf("\nEscolha a modalidade de pagamento:\n");
+    printf("1. Pagamento à vista\n");
+    printf("2. Pagamento parcelado com entrada\n");
+    printf("3. Pagamento parcelado sem entrada\n");
+    printf("Selecione a opção desejada: ");
+    scanf("%d", &opcao_pagamento);  // Coleta a escolha de pagamento
+
+    // Pagamento à vista (sem juros)
+    if (opcao_pagamento == 1) {
+        valor_total_pago = valor_veiculo_selecionado;  // Valor total é o preço do veículo
+        strcpy(modalidade_pagamento, "À vista");
+        printf("Pagamento à vista selecionado. Valor final: R$%.2f\n", valor_total_pago);
+
+    // Pagamento parcelado com entrada e juros de 1.5% ao mês
+    } else if (opcao_pagamento == 2) {
+        strcpy(modalidade_pagamento, "Parcelado com entrada");
+
+        printf("Insira o valor da entrada: ");
+        scanf("%f", &valor_entrada);  // Coleta o valor de entrada
+
+        if (valor_entrada >= valor_veiculo_selecionado) {
+            printf("O valor de entrada não pode ser igual ou superior ao valor do veículo.\n");
+            return;
+        }
+
+        float saldo_devedor = valor_veiculo_selecionado - valor_entrada;  // Calcula o saldo devedor
+        printf("Saldo devedor: R$%.2f\n", saldo_devedor);
+
+        printf("Escolha o número de parcelas (até 36 meses): ");
+        scanf("%d", &quantidade_mensalidades);  // Coleta a quantidade de parcelas
+
+        if (quantidade_mensalidades <= 0 || quantidade_mensalidades > 36) {
+            printf("Número de parcelas inválido. Tente novamente.\n");
+            return;
+        }
+
+        // Calcula o valor total com juros compostos de 1.5% ao mês
+        float taxa_juros = 0.015;  // Taxa de juros de 1.5% ao mês
+        float valor_financiado = saldo_devedor * pow(1 + taxa_juros, quantidade_mensalidades);  // Cálculo do montante com juros
+        float valor_parcela = valor_financiado / quantidade_mensalidades;  // Valor de cada parcela
+
+        valor_total_pago = valor_entrada + valor_financiado;  // Valor total pago (entrada + parcelas)
+
+        printf("Pagamento parcelado com entrada selecionado.\n");
+        printf("Valor total a ser pago: R$%.2f\n", valor_total_pago);
+        printf("Valor de cada parcela: R$%.2f\n", valor_parcela);
+        printf("Número de parcelas: %d\n", quantidade_mensalidades);
+
+    // Pagamento parcelado sem entrada e juros de 1.5% ao mês
+    } else if (opcao_pagamento == 3) {
+        strcpy(modalidade_pagamento, "Parcelado sem entrada");
+
+        float saldo_devedor = valor_veiculo_selecionado;  // Sem entrada, saldo devedor é o valor total do veículo
+
+        printf("Escolha o número de parcelas (até 36 meses): ");
+        scanf("%d", &quantidade_mensalidades);  // Coleta a quantidade de parcelas
+
+        if (quantidade_mensalidades <= 0 || quantidade_mensalidades > 36) {
+            printf("Número de parcelas inválido. Tente novamente.\n");
+            return;
+        }
+
+        // Calcula o valor total com juros compostos de 1.5% ao mês
+        float taxa_juros = 0.015;  // Taxa de juros de 1.5% ao mês
+        float valor_financiado = saldo_devedor * pow(1 + taxa_juros, quantidade_mensalidades);  // Cálculo do montante com juros
+        float valor_parcela = valor_financiado / quantidade_mensalidades;  // Valor de cada parcela
+
+        valor_total_pago = valor_financiado;  // Valor total pago (apenas parcelas, sem entrada)
+
+        printf("Pagamento parcelado sem entrada selecionado.\n");
+        printf("Valor total a ser pago: R$%.2f\n", valor_total_pago);
+        printf("Valor de cada parcela: R$%.2f\n", valor_parcela);
+        printf("Número de parcelas: %d\n", quantidade_mensalidades);
+
+    } else {
+        printf("Opção inválida. Operação cancelada.\n");
+        return;
+    }
+
+    // Chama a função para registrar a transação
+    registrar_transacao(veiculo_selecionado, valor_total_pago, modalidade_pagamento, valor_entrada, quantidade_mensalidades);
+}
+
+// Função que registra os detalhes da transação em um arquivo
+void registrar_transacao(char veiculo_escolhido[], float valor_total_pago, char modalidade_pagamento[], float valor_pago_entrada, int numero_mensalidades) {
+    char nome_cliente[50], telefone_cliente[20];  // Variáveis para armazenar os dados do cliente
+
+    printf("Informe o nome do cliente: ");
+    scanf("%s", nome_cliente);  // Coleta o nome do cliente
+    printf("Informe o telefone do cliente: ");
+    scanf("%s", telefone_cliente);  // Coleta o telefone do cliente
+
+    // Abre o arquivo "venda.txt" em modo de adição ("a")
+    FILE *arquivo_venda = fopen("venda.txt", "a");
+    if (arquivo_venda == NULL) {
+        printf("Erro crítico ao abrir o arquivo de vendas.\n");
+        return;
+    }
+
+    // Registra os detalhes da transação no arquivo
+    fprintf(arquivo_venda, "Cliente: %s\n", nome_cliente);
+    fprintf(arquivo_venda, "Telefone: %s\n", telefone_cliente);
+    fprintf(arquivo_venda, "Veículo: %s\n", veiculo_escolhido);
+    fprintf(arquivo_venda, "Modalidade de Pagamento: %s\n", modalidade_pagamento);
+    fprintf(arquivo_venda, "Valor da Entrada: R$%.2f\n", valor_pago_entrada);
+    fprintf(arquivo_venda, "Número de Parcelas: %d\n", numero_mensalidades);
+    fprintf(arquivo_venda, "Valor Total Pago: R$%.2f\n", valor_total_pago);
+    fprintf(arquivo_venda, "-----------------------------\n");
+
+    fclose(arquivo_venda);  // Fecha o arquivo
+    printf("Transação registrada com sucesso!\n");
+}  
+
